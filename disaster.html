@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Disaster Alerts & Advisory | Smart Weather System</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
+
+body{background:#020617;color:#e5e7eb}
+
+header{
+  background:#020617;
+  padding:16px;
+  display:flex;
+  justify-content:space-between;
+  border-bottom:1px solid #1e293b;
+}
+
+header h2{font-size:18px}
+
+button{
+  background:#2563eb;
+  color:white;
+  border:none;
+  padding:6px 14px;
+  border-radius:10px;
+  cursor:pointer;
+}
+
+.layout{
+  display:grid;
+  grid-template-columns:2fr 1fr;
+  gap:16px;
+  padding:16px;
+}
+
+#map{height:420px;border-radius:16px}
+
+/* ALERT PANEL */
+.alert-panel{
+  background:#0f172a;
+  padding:16px;
+  border-radius:16px;
+  max-height:420px;
+  overflow-y:auto;
+}
+
+.alert-item{
+  background:#020617;
+  padding:12px;
+  border-radius:12px;
+  margin-bottom:10px;
+  cursor:pointer;
+  transition:.2s;
+}
+
+.alert-item:hover{transform:scale(1.03)}
+
+.alert-severe{border-left:5px solid #ef4444}
+.alert-moderate{border-left:5px solid #f59e0b}
+.alert-info{border-left:5px solid #22c55e}
+
+/* BLINK */
+.blink-marker{
+  animation:blink 1s infinite;
+  font-size:26px;
+}
+@keyframes blink{50%{opacity:.3}}
+
+.section{
+  background:#0f172a;
+  margin:16px;
+  padding:16px;
+  border-radius:16px;
+}
+
+/* ADVISORY */
+.advisory-box{
+  background:#020617;
+  padding:16px;
+  border-radius:12px;
+  line-height:1.6;
+}
+
+/* RISK */
+.risk-bar{
+  height:14px;
+  border-radius:10px;
+  background:linear-gradient(to right,#22c55e,#facc15,#ef4444);
+  margin:10px 0;
+}
+
+/* USER REPORT */
+input,select,textarea{
+  width:100%;
+  padding:8px;
+  margin:6px 0;
+  border-radius:8px;
+  border:none;
+}
+
+.report{
+  background:#020617;
+  padding:10px;
+  border-radius:10px;
+  margin-top:6px;
+}
+/* ================= MOBILE RESPONSIVE ================= */
+@media (max-width: 1024px) {
+  .content {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Tablets & Phones */
+@media (max-width: 768px) {
+
+  body {
+    overflow-x: hidden;
+  }
+
+  /* DASHBOARD */
+  .dashboard {
+    flex-direction: column;
+  }
+
+  /* SIDEBAR → TOP BAR */
+  .sidebar {
+    width: 100%;
+    height: 60px;
+    flex-direction: row;
+    justify-content: space-around;
+    padding: 10px;
+  }
+
+  .sidebar a {
+    font-size: 20px;
+  }
+
+  /* MAIN */
+  .main {
+    padding: 14px;
+  }
+
+  /* TOP BAR */
+  .topbar {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .search-box {
+    width: 100%;
+  }
+
+  .search-box input {
+    width: 100%;
+  }
+
+  /* CARDS */
+  .card {
+    padding: 16px;
+    border-radius: 16px;
+  }
+
+  .temp {
+    font-size: 42px;
+  }
+
+  /* TODAY / WEEK */
+  .today-week {
+    flex-direction: column;
+  }
+
+  .hourly {
+    overflow-x: auto;
+  }
+
+  /* OTHER CITIES */
+  .cities-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* MAP */
+  #indiaMap {
+    height: 320px !important;
+  }
+
+  /* NEWS */
+  .news-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* FORMS */
+  input, textarea, button {
+    font-size: 16px;
+  }
+}
+
+/* Small Phones */
+@media (max-width: 480px) {
+
+  h1, h2, h3 {
+    font-size: 18px;
+  }
+
+  .temp {
+    font-size: 36px;
+  }
+
+  .sidebar a {
+    font-size: 18px;
+  }
+
+  .hour-card {
+    width: 60px;
+    font-size: 12px;
+  }
+
+  .alert-box {
+    width: 90%;
+  }
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+  <h2>🚨 Disaster Alert & Advisory Dashboard</h2>
+  <button onclick="window.location.href='index.html'">Home</button>
+</header>
+
+<div class="layout">
+  <div id="map"></div>
+  <div class="alert-panel">
+    <h3>Live Alerts</h3>
+    <div id="alertList"></div>
+  </div>
+</div>
+
+<!-- ADVISORY -->
+<div class="section">
+  <h3>📢 Advisory (Auto-Generated)</h3>
+  <div id="advisoryBox" class="advisory-box">
+    Select an alert to view detailed advisory
+  </div>
+</div>
+
+<!-- RISK DASHBOARD -->
+<div class="section">
+  <h3>📊 Risk Prediction Dashboard</h3>
+  <div id="riskText">No alert selected</div>
+  <div class="risk-bar"></div>
+  <small id="riskNote"></small>
+</div>
+
+<!-- USER WEATHER REPORT -->
+<div class="section">
+  <h3>🗣 Share Weather in Your Area</h3>
+
+  <input id="userLocation" placeholder="Your city / district">
+  <select id="userCondition">
+    <option>Heavy Rain</option>
+    <option>Flooding</option>
+    <option>Strong Winds</option>
+    <option>Extreme Heat</option>
+    <option>Normal</option>
+  </select>
+  <select id="userSeverity">
+    <option>Mild</option>
+    <option>Moderate</option>
+    <option>Severe</option>
+  </select>
+  <textarea id="userMsg" placeholder="Describe the situation..."></textarea>
+  <button onclick="submitReport()">Submit</button>
+
+  <div id="reports"></div>
+</div>
+
+<script>
+/* MAP */
+const map=L.map("map",{center:[22.5,78.9],zoom:5,minZoom:4,maxZoom:7,
+  maxBounds:[[6.5,68],[37.5,97.5]]});
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
+
+
+const alertIcon=L.divIcon({className:"blink-marker",html:"🚨"});
+let markers=[];
+
+/* ALERT DATA */
+const alerts=[
+ {title:"Cyclone Warning – Mumbai",lat:19.07,lon:72.87,severity:"severe",type:"Cyclone"},
+ {title:"Flood Alert – Kolkata",lat:22.57,lon:88.36,severity:"moderate",type:"Flood"},
+ {title:"Heatwave Alert – Delhi",lat:28.61,lon:77.21,severity:"info",type:"Heatwave"}
+];
+
+/* RENDER ALERTS */
+function renderAlerts(){
+  const list=document.getElementById("alertList");
+  list.innerHTML="";
+  markers.forEach(m=>map.removeLayer(m));
+  markers=[];
+
+  alerts.forEach(a=>{
+    const m=L.marker([a.lat,a.lon],{icon:alertIcon}).addTo(map);
+    markers.push(m);
+
+    const div=document.createElement("div");
+    div.className=`alert-item alert-${a.severity}`;
+    div.innerHTML=`<b>${a.title}</b><br><small>${a.severity.toUpperCase()}</small>`;
+    div.onclick=()=>{
+      map.setView([a.lat,a.lon],7);
+      showAdvisory(a);
+    };
+    list.appendChild(div);
+  });
+}
+
+/* ADVISORY */
+function showAdvisory(a){
+  const box=document.getElementById("advisoryBox");
+  const riskText=document.getElementById("riskText");
+  const riskNote=document.getElementById("riskNote");
+
+  const data={
+    Cyclone:`<b>Situation:</b> Strong winds and heavy rainfall expected.<br>
+    <b>Impact:</b> Power outages, coastal flooding, transport disruption.<br>
+    <b>Precautions:</b>
+    <ul>
+      <li>Stay indoors</li>
+      <li>Secure loose objects</li>
+      <li>Follow evacuation orders</li>
+    </ul>
+    <b>Government:</b> Follow IMD & NDMA alerts.`,
+    Flood:`<b>Situation:</b> River levels rising due to continuous rainfall.<br>
+    <b>Impact:</b> Road blockages, water contamination.<br>
+    <b>Precautions:</b>
+    <ul>
+      <li>Move to higher ground</li>
+      <li>Avoid flood water</li>
+    </ul>
+    <b>Government:</b> Local disaster control rooms activated.`,
+    Heatwave:`<b>Situation:</b> Extreme temperatures above normal.<br>
+    <b>Impact:</b> Heat stroke risk, dehydration.<br>
+    <b>Precautions:</b>
+    <ul>
+      <li>Avoid outdoor activity</li>
+      <li>Drink water regularly</li>
+    </ul>
+    <b>Government:</b> Heat Action Plan in effect.`
+  };
+
+  box.innerHTML=data[a.type];
+
+  riskText.innerHTML=`Risk Level: <b>${a.severity.toUpperCase()}</b>`;
+  riskNote.innerText="Risk score based on historical data & weather patterns (mock model)";
+}
+
+/* USER REPORT */
+async function submitReport() {
+
+    const title = document.getElementById("userCondition").value;
+    const location = document.getElementById("userLocation").value;
+    const severity = document.getElementById("userSeverity").value;
+    const message = document.getElementById("userMsg").value;
+
+    if (!location || !message) {
+        alert("Please fill all fields");
+        return;
+    }
+
+    const time = new Date().toLocaleString();
+
+    try {
+        const res = await fetch("http://127.0.0.1:5000/api/disaster/add", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                title,
+                location,
+                severity,
+                time
+            })
+        });
+
+        if (!res.ok) {
+            alert("Server error. Could not save report.");
+            return;
+        }
+
+        alert("✔ Disaster Report Submitted!");
+
+        const box = document.getElementById("reports");
+        const div = document.createElement("div");
+        div.className = "report";
+        div.innerHTML = `<b>${location}</b> - ${title} (${severity})<br>${message}`;
+        box.prepend(div);
+
+        document.getElementById("userLocation").value = "";
+        document.getElementById("userMsg").value = "";
+
+    } catch (err) {
+        alert("Network error: " + err);
+    }
+}
+renderAlerts();
+</script>
+
+</body>
+</html>

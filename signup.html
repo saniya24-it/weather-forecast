@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Sign Up | Weather Forecast</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif;}
+body{
+  min-height:100vh;
+  background:linear-gradient(180deg,#0a2540,#0e3a74,#2179ff);
+  display:flex;justify-content:center;align-items:center;padding:20px;
+}
+.card{
+  width:100%;max-width:420px;padding:40px 34px;border-radius:20px;
+  background:#ffffff;border:1px solid #e5e7eb;
+  box-shadow:0 12px 35px rgba(0,0,0,0.15);
+  animation:fadeUp .6s ease;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(25px);}to{opacity:1;transform:translateY(0);}}
+.header{
+  text-align:center;font-size:26px;font-weight:800;color:#0a2540;margin-bottom:8px;
+}
+.sub{
+  text-align:center;color:#475569;font-size:15px;margin-bottom:28px;
+}
+.form-group{margin-bottom:20px;}
+input{
+  width:100%;padding:14px 16px;border:2px solid #e2e8f0;border-radius:12px;font-size:15px;
+  transition:.25s;background:#f8fafc;
+}
+input:focus{
+  border-color:#2179ff;box-shadow:0 0 0 3px rgba(33,121,255,0.25);outline:none;
+}
+.pass-wrapper{position:relative;}
+.eye{
+  position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  cursor:pointer;font-size:18px;color:#475569;
+}
+button{
+  width:100%;padding:15px;background:#2179ff;color:white;font-weight:700;font-size:16px;
+  border:none;border-radius:12px;cursor:pointer;transition:.25s;margin-top:5px;
+}
+button:hover{background:#0e5ae8;transform:translateY(-2px);}
+.footer{text-align:center;margin-top:20px;color:#0a2540;font-size:14px;}
+.footer a{color:#2179ff;font-weight:600;text-decoration:none;}
+.footer a:hover{text-decoration:underline;}
+.error,.success{
+  padding:12px;border-radius:10px;font-size:14px;display:none;margin-bottom:12px;
+}
+.error{background:#fee2e2;color:#b91c1c;}
+.success{background:#dcfce7;color:#15803d;}
+@media(max-width:480px){.card{padding:32px 26px;}.header{font-size:24px;}}
+</style>
+</head>
+
+<body>
+<div class="card">
+  <div class="header">WEATHER FORECAST</div>
+  <div class="sub">Create your account</div>
+
+  <div class="error" id="error"></div>
+  <div class="success" id="success"></div>
+
+  <form id="signupForm">
+
+    <div class="form-group">
+      <input type="text" id="name" placeholder="Full Name" required>
+    </div>
+
+    <div class="form-group">
+      <input type="email" id="email" placeholder="Email" required>
+    </div>
+
+    <div class="form-group pass-wrapper">
+      <input type="password" id="password" placeholder="Password" required>
+      <span class="eye" id="toggleEye1">👁️</span>
+    </div>
+
+    <div class="form-group pass-wrapper">
+      <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
+      <span class="eye" id="toggleEye2">👁️</span>
+    </div>
+
+    <button type="submit">Sign Up</button>
+  </form>
+
+  <div class="footer">
+    Already have an account? <a href="login.html">Login</a>
+  </div>
+</div>
+
+<script>
+function togglePassword(inputId, eyeId) {
+  const input = document.getElementById(inputId);
+  const eye = document.getElementById(eyeId);
+
+  eye.addEventListener("click", () => {
+    const type = input.type === "password" ? "text" : "password";
+    input.type = type;
+    eye.textContent = type === "password" ? "👁️" : "🙈";
+  });
+}
+
+togglePassword("password", "toggleEye1");
+togglePassword("confirmPassword", "toggleEye2");
+
+document.getElementById("signupForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const name = document.getElementById("name").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const confirmPassword = document.getElementById("confirmPassword").value.trim();
+  const error = document.getElementById("error");
+  const success = document.getElementById("success");
+
+  error.style.display = "none";
+  success.style.display = "none";
+
+  if (password !== confirmPassword) {
+    error.textContent = "Passwords do not match.";
+    error.style.display = "block";
+    return;
+  }
+
+  try {
+    const res = await fetch("http://127.0.0.1:5000/api/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email, password })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      error.textContent = data.message;
+      error.style.display = "block";
+      return;
+    }
+
+    success.textContent = "Signup successful! Redirecting...";
+    success.style.display = "block";
+
+    setTimeout(() => {
+      window.location.href = "login.html";
+    }, 1200);
+
+  } catch (err) {
+    error.textContent = "Server not reachable.";
+    error.style.display = "block";
+  }
+});
+</script>
+
+</body>
+</html>

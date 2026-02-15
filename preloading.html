@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Loading Weather Forecast</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+body {
+  height: 100vh;
+  background: radial-gradient(circle at top, #020617, #020617);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===== LOADER ===== */
+.loader-box {
+  text-align: center;
+}
+
+.weather-icon {
+  font-size: 44px;
+  margin-bottom: 14px;
+}
+
+/* SEMI CIRCLE */
+.semi-circle {
+  width: 160px;
+  height: 80px;
+  background: #1e293b;
+  border-top-left-radius: 160px;
+  border-top-right-radius: 160px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* 🔁 REVERSED GRADIENT: BLUE → YELLOW */
+.progress {
+  width: 160px;
+  height: 80px;
+  background: linear-gradient(
+    90deg,
+    #2563eb,
+    #38bdf8,
+    #facc15
+  );
+  border-top-left-radius: 160px;
+  border-top-right-radius: 160px;
+  position: absolute;
+  bottom: 0;
+  transform-origin: center bottom;
+  transform: rotate(0deg);
+}
+
+.percent {
+  margin-top: -40px;
+  font-size: 26px;
+  font-weight: 600;
+  color: #e5e7eb;
+}
+
+.status {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #94a3b8;
+  letter-spacing: 0.5px;
+}
+/* ================= MOBILE RESPONSIVE ================= */
+@media (max-width: 1024px) {
+  .content {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Tablets & Phones */
+@media (max-width: 768px) {
+
+  body {
+    overflow-x: hidden;
+  }
+
+  /* DASHBOARD */
+  .dashboard {
+    flex-direction: column;
+  }
+
+  /* SIDEBAR → TOP BAR */
+  .sidebar {
+    width: 100%;
+    height: 60px;
+    flex-direction: row;
+    justify-content: space-around;
+    padding: 10px;
+  }
+
+  .sidebar a {
+    font-size: 20px;
+  }
+
+  /* MAIN */
+  .main {
+    padding: 14px;
+  }
+
+  /* TOP BAR */
+  .topbar {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .search-box {
+    width: 100%;
+  }
+
+  .search-box input {
+    width: 100%;
+  }
+
+  /* CARDS */
+  .card {
+    padding: 16px;
+    border-radius: 16px;
+  }
+
+  .temp {
+    font-size: 42px;
+  }
+
+  /* TODAY / WEEK */
+  .today-week {
+    flex-direction: column;
+  }
+
+  .hourly {
+    overflow-x: auto;
+  }
+
+  /* OTHER CITIES */
+  .cities-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* MAP */
+  #indiaMap {
+    height: 320px !important;
+  }
+
+  /* NEWS */
+  .news-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* FORMS */
+  input, textarea, button {
+    font-size: 16px;
+  }
+}
+
+/* Small Phones */
+@media (max-width: 480px) {
+
+  h1, h2, h3 {
+    font-size: 18px;
+  }
+
+  .temp {
+    font-size: 36px;
+  }
+
+  .sidebar a {
+    font-size: 18px;
+  }
+
+  .hour-card {
+    width: 60px;
+    font-size: 12px;
+  }
+
+  .alert-box {
+    width: 90%;
+  }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="loader-box">
+  <div class="weather-icon">☀️</div>
+
+  <div class="semi-circle">
+    <div class="progress" id="progress"></div>
+  </div>
+
+  <div class="percent" id="percent">0%</div>
+  <div class="status" id="status">Detecting weather...</div>
+</div>
+
+<script>
+/* LOADER PROGRESS */
+let percent = 0;
+const progress = document.getElementById("progress");
+const percentText = document.getElementById("percent");
+
+const loader = setInterval(() => {
+  percent++;
+  percentText.textContent = percent + "%";
+  progress.style.transform = `rotate(${percent * 1.8}deg)`;
+
+  if (percent >= 100) {
+    clearInterval(loader);
+    setTimeout(() => {
+      window.location.href = "intro.html";
+    }, 500);
+  }
+}, 25);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Donation | Disaster Relief</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+  background: linear-gradient(135deg,#0b1220,#020617);
+  font-family: system-ui, sans-serif;
+  color:#020617;
+}
+
+header{
+  background:#1e40af;
+  color:white;
+  padding:16px 30px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+header button{
+  background:#2563eb;
+  color:white;
+  border:none;
+  padding:8px 16px;
+  border-radius:20px;
+  cursor:pointer;
+}
+
+.container{
+  max-width:900px;
+  margin:40px auto;
+  background:white;
+  border-radius:20px;
+  padding:30px;
+}
+
+h2{text-align:center;margin-bottom:20px;}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+}
+
+input,select{
+  padding:12px;
+  border-radius:10px;
+  border:1px solid #cbd5f5;
+  font-size:14px;
+}
+
+.full{grid-column:1/-1;}
+
+.amounts button,.payment button{
+  padding:8px 14px;
+  border-radius:20px;
+  border:1px solid #cbd5f5;
+  cursor:pointer;
+  background:#f1f5f9;
+  margin:5px;
+}
+
+.active{
+  background:#2563eb!important;
+  color:white!important;
+}
+
+.donate{
+  width:100%;
+  padding:12px;
+  margin-top:20px;
+  border:none;
+  border-radius:25px;
+  font-size:16px;
+  background:#16a34a;
+  color:white;
+  cursor:pointer;
+}
+
+.history{
+  margin-top:40px;
+}
+
+.history h3{margin-bottom:10px;}
+
+.history table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+.history th,.history td{
+  border-bottom:1px solid #e5e7eb;
+  padding:10px;
+  text-align:left;
+  font-size:14px;
+}
+
+.receipt{
+  display:none;
+  background:#f8fafc;
+  padding:20px;
+  border-radius:14px;
+  margin-top:20px;
+}
+/* ================= MOBILE RESPONSIVE ================= */
+@media (max-width: 1024px) {
+  .content {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Tablets & Phones */
+@media (max-width: 768px) {
+
+  body {
+    overflow-x: hidden;
+  }
+
+  /* DASHBOARD */
+  .dashboard {
+    flex-direction: column;
+  }
+
+  /* SIDEBAR → TOP BAR */
+  .sidebar {
+    width: 100%;
+    height: 60px;
+    flex-direction: row;
+    justify-content: space-around;
+    padding: 10px;
+  }
+
+  .sidebar a {
+    font-size: 20px;
+  }
+
+  /* MAIN */
+  .main {
+    padding: 14px;
+  }
+
+  /* TOP BAR */
+  .topbar {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .search-box {
+    width: 100%;
+  }
+
+  .search-box input {
+    width: 100%;
+  }
+
+  /* CARDS */
+  .card {
+    padding: 16px;
+    border-radius: 16px;
+  }
+
+  .temp {
+    font-size: 42px;
+  }
+
+  /* TODAY / WEEK */
+  .today-week {
+    flex-direction: column;
+  }
+
+  .hourly {
+    overflow-x: auto;
+  }
+
+  /* OTHER CITIES */
+  .cities-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* MAP */
+  #indiaMap {
+    height: 320px !important;
+  }
+
+  /* NEWS */
+  .news-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* FORMS */
+  input, textarea, button {
+    font-size: 16px;
+  }
+}
+
+/* Small Phones */
+@media (max-width: 480px) {
+
+  h1, h2, h3 {
+    font-size: 18px;
+  }
+
+  .temp {
+    font-size: 36px;
+  }
+
+  .sidebar a {
+    font-size: 18px;
+  }
+
+  .hour-card {
+    width: 60px;
+    font-size: 12px;
+  }
+
+  .alert-box {
+    width: 90%;
+  }
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+  <h3>SMART WEATHER – Donation Portal</h3>
+  <button onclick="window.location.href='index.html'">Home</button>
+</header>
+
+<div class="container">
+
+<h2>Make a Donation</h2>
+
+<div class="grid">
+  <input id="name" placeholder="Full Name">
+  <input id="phone" placeholder="Contact (10 digits)" maxlength="10">
+  <input id="email" placeholder="Email Address">
+  <select id="fund" class="full">
+    <option value="">Select Disaster Fund</option>
+    <option>Cyclone Relief</option>
+    <option>Flood Recovery</option>
+    <option>Heatwave Emergency</option>
+    <option>General Disaster Fund</option>
+  </select>
+</div>
+
+<h4 style="margin-top:20px;">Payment Method</h4>
+<div class="payment">
+  <button onclick="selectPayment(this)">UPI</button>
+  <button onclick="selectPayment(this)">Credit Card</button>
+  <button onclick="selectPayment(this)">Net Banking</button>
+</div>
+
+<h4>Donation Amount</h4>
+<div class="amounts">
+  <button onclick="selectAmount(this)">500</button>
+  <button onclick="selectAmount(this)">1000</button>
+  <button onclick="selectAmount(this)">5000</button>
+</div>
+
+<button class="donate" onclick="payNow()">Donate Now</button>
+
+<!-- RECEIPT -->
+<div class="receipt" id="receipt">
+  <h3>Payment Receipt</h3>
+  <p><b>Name:</b> <span id="rName"></span></p>
+  <p><b>Fund:</b> <span id="rFund"></span></p>
+  <p><b>Amount:</b> ₹<span id="rAmount"></span></p>
+  <p><b>Transaction ID:</b> <span id="rTxn"></span></p>
+  <p><b>Date:</b> <span id="rDate"></span></p>
+  <button onclick="window.print()">Print Receipt</button>
+</div>
+
+<!-- HISTORY -->
+<div class="history">
+  <h3>Donation History</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Fund</th>
+        <th>Amount</th>
+        <th>Transaction</th>
+      </tr>
+    </thead>
+    <tbody id="historyBody"></tbody>
+  </table>
+</div>
+
+</div>
+
+<script>
+let selectedAmount = null;
+let selectedPayment = null;
+
+/* PAYMENT SELECTION */
+function selectAmount(btn){
+  document.querySelectorAll(".amounts button").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  selectedAmount = btn.innerText;
+}
+
+function selectPayment(btn){
+  document.querySelectorAll(".payment button").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  selectedPayment = btn.innerText;
+}
+
+/* VALIDATION + PAYMENT */
+function payNow(){
+  const name = document.getElementById("name").value;
+  const phone = document.getElementById("phone").value;
+  const fund = document.getElementById("fund").value;
+
+  if(!/^\d{10}$/.test(phone)){
+    alert("Contact number must be exactly 10 digits");
+    return;
+  }
+
+  if(!name || !fund || !selectedAmount || !selectedPayment){
+    alert("Please complete all details");
+    return;
+  }
+
+  const txn = "TXN" + Math.floor(Math.random()*1000000);
+  const date = new Date().toLocaleString();
+
+  /* SAVE HISTORY */
+  const history = JSON.parse(localStorage.getItem("donations") || "[]");
+  history.push({date,fund,amount:selectedAmount,txn});
+  localStorage.setItem("donations",JSON.stringify(history));
+
+  /* SHOW RECEIPT */
+  document.getElementById("receipt").style.display="block";
+  rName.innerText=name;
+  rFund.innerText=fund;
+  rAmount.innerText=selectedAmount;
+  rTxn.innerText=txn;
+  rDate.innerText=date;
+
+  saveDonation(name, document.getElementById("email").value, selectedAmount, txn);
+
+  loadHistory();
+}
+
+/* LOAD HISTORY */
+function loadHistory(){
+  const history = JSON.parse(localStorage.getItem("donations") || "[]");
+  const body = document.getElementById("historyBody");
+  body.innerHTML="";
+  history.forEach(h=>{
+    body.innerHTML+=`
+      <tr>
+        <td>${h.date}</td>
+        <td>${h.fund}</td>
+        <td>₹${h.amount}</td>
+        <td>${h.txn}</td>
+      </tr>
+    `;
+  });
+}
+fetch("/api/donation/create-order")
+
+loadHistory();
+
+async function saveDonation(name, email, amount, txnId) {
+  await fetch("http://127.0.0.1:5000/api/donate", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      name,
+      email,
+      amount,
+      payment_id: txnId,
+      status: "SUCCESS"
+    })
+  });
+}
+
+</script>
+
+</body>
+</html>

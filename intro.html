@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Weather Forecast</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+/* ================= MODERN NEON GRADIENT + CLEAN + PROFESSIONAL ================= */
+:root{
+  --bg-gradient: radial-gradient(circle at 50% 100%, #001026 0%, #000814 40%, #00040d 100%);
+  --glass-bg: rgba(255,255,255,0.03);
+  --glass-border: rgba(0,200,255,0.22);
+  --text-main:#e3e9ff;
+  --text-sub:#cfd9ff;
+  --button-bg:#3a7bd5;
+  --button-hover:#2a5fc9;
+  --accent:#6acbff;
+}
+
+[data-theme="light"]{
+  --bg-gradient: linear-gradient(135deg,#dbeafe,#e0f0ff,#ffffff);
+  --glass-bg: rgba(255,255,255,0.6);
+  --glass-border: rgba(255,255,255,0.85);
+  --text-main:#0b1a35;
+  --text-sub:#54617a;
+  --button-bg:#3b6eea;
+  --button-hover:#295bcc;
+  --accent:#3b6eea;
+}
+
+body{
+  margin:0;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:var(--bg-gradient);
+  font-family:-apple-system, "SF Pro Display", system-ui;
+  color:var(--text-main);
+  overflow:hidden;
+  position:relative;
+}
+
+/* SMOOTH COLOR MOTION */
+.aurora{
+  position:absolute;
+  width:160%;
+  height:40vh;
+  top:30%;
+  left:-10%;
+  transform:translateX(-50%);
+  background:linear-gradient(90deg,#3a7bd5 0%,#6a00ff 50%,#00eaff 100%);
+  opacity:0.55;
+  filter:blur(40px);
+  animation:neonLine 6s infinite alternate ease-in-out;
+}
+@keyframes neonLine{
+  0%{transform:translateX(-50%) translateX(-10%) scale(1)}
+  100%{transform:translateX(-50%) translateX(10%) scale(1.1)}
+}
+@keyframes neonLine{
+  0%{transform:translateX(-10%) scale(1)}
+  100%{transform:translateX(10%) scale(1.1)}
+}
+@keyframes neonFlow{
+  0%{transform:translate(-8%,-4%) scale(1)}
+  100%{transform:translate(8%,4%) scale(1.15)}
+}
+@keyframes moveGlow{0%{transform:translate(-5%,-5%)}100%{transform:translate(5%,5%)}}
+
+/* MAIN CARD */
+.container{
+  transform:translateX(250px) translateY(25px);
+  box-shadow:0 0 22px rgba(0,200,255,0.25), 0 0 60px rgba(140,0,255,0.18);
+  width:auto; max-width:540px; margin:auto;
+  padding:34px 26px;
+  border-radius:26px;
+  background:var(--glass-bg);
+  border:1.3px solid var(--glass-border);
+  backdrop-filter:blur(22px);
+  -webkit-backdrop-filter:blur(22px);
+  box-shadow:0 20px 50px rgba(0,0,0,0.35);
+  text-align:center;
+  animation:fadeUp .9s ease forwards;
+  opacity:0;transform:translateY(25px);
+}
+@keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
+
+/* WEATHER ICON — CLEAN + MODERN */
+.weather-icon{
+  width:80px;height:80px;margin:0 auto 18px auto;position:relative;
+}
+.sun{
+  position:absolute;top:14px;left:50%;transform:translateX(-50%);
+  width:45px;height:45px;border-radius:50%;
+  background:#ffd85e;
+  box-shadow:0 0 14px rgba(255,220,120,0.7);
+  animation:spin 8s linear infinite;
+}
+@keyframes spin{to{transform:translateX(-50%) rotate(360deg)}}
+.cloud{
+  position:absolute;bottom:6px;left:50%;transform:translateX(-50%);
+  width:75px;height:35px;background:white;border-radius:40px;
+  animation:float 3.5s ease-in-out infinite;
+}
+@keyframes float{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-6px)}}
+
+h1{
+  font-size:32px;font-weight:800;margin-bottom:12px;
+}
+
+p{
+  font-size:15px;line-height:1.55;color:var(--text-sub);
+  max-width:420px;margin:0 auto 32px auto;
+}
+
+.buttons{
+  display:flex;justify-content:center;gap:16px;flex-wrap:wrap;
+}
+.buttons a{
+  padding:12px 28px;border-radius:12px;text-decoration:none;
+  background:var(--button-bg);color:white;
+  font-size:16px;font-weight:600;
+  transition:.25s;
+  box-shadow:0 6px 22px rgba(0,0,0,0.28);
+}
+.buttons a:hover{transform:translateY(-4px);background:var(--button-hover)}
+
+/* THEME BUTTON */
+.theme-toggle{
+  position:fixed;top:20px;right:20px;
+  background:var(--glass-bg);
+  border:1.3px solid var(--glass-border);
+  backdrop-filter:blur(12px);
+  padding:10px 12px;border-radius:50%;font-size:20px;
+  cursor:pointer;color:var(--accent);
+}
+
+/* RESPONSIVE */
+@media(min-width:900px){
+  .container{max-width:640px;padding:40px 30px;}
+  h1{font-size:38px}
+  p{font-size:17px}
+  .buttons a{padding:14px 32px;font-size:17px}
+}
+
+@media(max-width:420px){
+  h1{font-size:26px}
+  .weather-icon{width:70px;height:70px}
+  .buttons a{width:100%;text-align:center}
+}
+
+</style>
+</head>
+
+<body>
+<div class="aurora"></div>
+
+<button class="theme-toggle" id="themeToggle">🌙</button>
+
+<div class="container">
+  <div class="weather-icon">
+    <div class="sun"></div>
+    <div class="cloud"></div>
+  </div>
+
+  <h1>Weather Forecast</h1>
+  <p>Accurate weather reports with a clean, modern neon gradient interface for a fresh experience.</p>
+
+  <div class="buttons">
+    <a href="login.html">Login</a>
+    <a href="signup.html">Sign Up</a>
+  </div>
+</div>
+
+<script>
+const root=document.documentElement;
+const toggle=document.getElementById("themeToggle");
+let theme=localStorage.getItem("theme")||"dark";
+applyTheme(theme);
+
+function applyTheme(mode){
+  root.setAttribute("data-theme",mode);
+  localStorage.setItem("theme",mode);
+  toggle.textContent = mode==="light" ? "☀️" : "🌙";
+}
+
+toggle.addEventListener("click",()=>{
+  theme = theme==="light" ? "dark" : "light";
+  applyTheme(theme);
+});
+</script>
+</body>
+</html>
