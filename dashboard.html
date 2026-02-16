@@ -1,0 +1,1196 @@
+Conversation opened. 1 read message.
+
+Skip to content
+Using Gmail with screen readers
+40 of 1,180
+(no subject)
+Inbox
+
+Saniya Mahadik <saniyamahadik054@gmail.com>
+Attachments
+Tue 10 Feb, 20:24 (6 days ago)
+to me
+
+
+ 28 attachment
+  •  Scanned by Gmail
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Smart Weather Forecast Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: system-ui, sans-serif;
+}
+
+body {
+  background: linear-gradient(135deg, #0b1220, #020617);
+  color: #e5e7eb;
+}
+
+.dashboard {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 70px;
+  background: #020617;
+  display: flex;
+  flex-direction: column;   /* 👈 THIS IS THE KEY */
+  align-items: center;
+  padding: 20px 0;
+  gap: 20px;                /* space between icons */
+}
+
+.sidebar a {
+  font-size: 22px;
+  cursor: pointer;
+  color: #9ca3af;
+  transition: transform 0.2s, color 0.2s;
+}
+
+.sidebar a:hover {
+  transform: scale(1.2);
+  color: #6366f1;
+}
+
+
+
+/* Main */
+.main {
+  flex: 1;
+  padding: 20px;
+}
+
+/* Top bar */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.search-box {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.search-box input {
+  width: 260px;
+  padding: 10px 14px;
+  border-radius: 20px;
+  border: none;
+  background: #111827;
+  color: white;
+}
+
+.search-box button {
+  padding: 10px 18px;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+  background: #6366f1;
+  color: white;
+  font-weight: 600;
+}
+
+.logout {
+  background: #ef4444;
+  border: none;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 14px;
+  cursor: pointer;
+}
+
+/* Cards */
+.card {
+  height: auto;
+  background: #0f172a;
+  border-radius: 20px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.date {
+  font-size: 14px;
+  color: #9ca3af;
+  margin-bottom: 10px;
+}
+
+.content {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+}
+
+.temp {
+  font-size: 56px;
+  font-weight: bold;
+}
+
+.other-cities {
+  background: #0f172a;
+}
+
+.other-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.other-header small {
+  opacity: 0.6;
+  cursor: pointer;
+}
+
+.cities-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.city-card {
+  background: #020617;
+  border-radius: 16px;
+  padding: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.city-card h4 {
+  font-size: 16px;
+}
+
+.city-card span {
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+.city-temp {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.city-card img {
+  width: 40px;
+}
+
+/* Today / Week Section */
+.today-week {
+  display: flex;
+  gap: 20px;
+}
+
+.tw-left {
+  flex: 3;
+}
+
+.tw-right {
+  flex: 1;
+  background: #020617;
+  border-radius: 16px;
+  padding: 16px;
+  text-align: center;
+}
+
+.hourly {
+  display: flex;
+  gap: 10px;
+  margin: 12px 0;
+}
+
+.hour-card {
+  background: #020617;
+  padding: 10px;
+  border-radius: 14px;
+  text-align: center;
+  width: 70px;
+  font-size: 13px;
+}
+
+.hour-card img {
+  width: 35px;
+}
+
+.tomorrow {
+  margin-top: 12px;
+  background: #020617;
+  border-radius: 16px;
+  padding: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  height: 150px;
+}
+
+/* LIGHT MODE */
+body.light {
+  background: linear-gradient(135deg, #f8fafc, #e5e7eb);
+  color: #020617;
+}
+
+body.light .card,
+body.light .other-cities {
+  background: #ffffff;
+  color: #020617;
+}
+
+body.light .sidebar {
+  background: #e5e7eb;
+}
+
+body.light .search-box input {
+  background: #ffffff;
+  color: #020617;
+}
+
+body.light .city-card,
+body.light .hour-card,
+body.light .tw-right,
+body.light .tomorrow {
+  background: #f1f5f9;
+}
+
+body.light .logout {
+  background: #dc2626;
+  color: white;
+}
+
+#indiaMap {
+  height: 450px !important;
+  width: 100%;
+  border-radius: 16px;
+}
+
+.map-card {
+  grid-column: 1 / -1; /* span full grid width */
+}
+.news-section {
+  margin: 20px;
+}
+
+.news-header {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.live-badge {
+  background: #ef4444;
+  color: white;
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  margin-left: 8px;
+  animation: pulse 1.2s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: .6; }
+  100% { opacity: 1; }
+}
+
+.news-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.news-card {
+  background: #020617;
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.news-card:hover {
+  transform: scale(1.03);
+}
+
+.news-thumb {
+  position: relative;
+}
+
+.news-thumb img {
+  width: 100%;
+  display: block;
+}
+
+.play-btn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0,0,0,0.6);
+  color: white;
+  font-size: 28px;
+  padding: 10px 16px;
+  border-radius: 50%;
+}
+
+.news-info {
+  padding: 12px;
+}
+
+.news-title {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.news-date {
+  font-size: 12px;
+  opacity: 0.6;
+  margin-top: 4px;
+}
+
+.news-tag {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: #2563eb;
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 12px;
+}
+
+.ad-news {
+  cursor: pointer;
+}
+
+.ad-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #2563eb;
+  margin-bottom: 10px;
+}
+
+.news-article {
+  background: #020617;
+  border-radius: 16px;
+  padding: 18px;
+  transition: background 0.3s;
+  animation: fade 0.5s ease;
+}
+
+.news-article:hover {
+  background: #111827;
+}
+
+.news-article h3 {
+  font-size: 18px;
+  margin: 8px 0;
+}
+
+.news-article p {
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+.news-article small {
+  display: block;
+  margin-top: 10px;
+  opacity: 0.6;
+}
+
+.news-badge {
+  background: #ef4444;
+  color: white;
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+@keyframes fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Light mode support */
+body.light .news-article {
+  background: #f1f5f9;
+}
+
+
+/* Light mode */
+body.light .news-card {
+  background: #f1f5f9;
+}
+
+body.light .news-tag {
+  background: #020617;
+}
+/* ================= FOOTER ================= */
+.footer {
+  background: #020617;
+  color: #9ca3af;
+  padding: 40px 30px 20px;
+  margin-top: 40px;
+  font-size: 14px;
+}
+
+.footer a {
+  color: #e5e7eb;
+  text-decoration: none;
+  display: block;
+  margin: 6px 0;
+  font-size: 13px;
+}
+
+.footer a:hover {
+  color: #6366f1;
+}
+
+.footer-top {
+  margin-bottom: 20px;
+  font-size: 13px;
+  color: #9ca3af;
+}
+
+.footer-top span {
+  margin-right: 6px;
+}
+
+.footer-near {
+  background: #111827;
+  padding: 10px 14px;
+  border-radius: 10px;
+  margin: 15px 0;
+  font-size: 13px;
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 30px;
+  margin-top: 30px;
+}
+
+.footer h4 {
+  color: #e5e7eb;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.footer-social {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.footer-social i {
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.footer-bottom {
+  border-top: 1px solid #111827;
+  margin-top: 30px;
+  padding-top: 15px;
+  font-size: 12px;
+  text-align: center;
+}
+
+.footer-bottom a {
+  display: inline;
+  margin: 0 6px;
+  font-size: 12px;
+}
+
+/* ================= MOBILE RESPONSIVE ================= */
+@media (max-width: 1024px) {
+  .content {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Tablets & Phones */
+@media (max-width: 768px) {
+
+  body {
+    overflow-x: hidden;
+  }
+
+  /* DASHBOARD */
+  .dashboard {
+    flex-direction: column;
+  }
+
+  /* SIDEBAR → TOP BAR */
+  .sidebar {
+    width: 100%;
+    height: 60px;
+    flex-direction: row;
+    justify-content: space-around;
+    padding: 10px;
+  }
+
+  .sidebar a {
+    font-size: 20px;
+  }
+
+  /* MAIN */
+  .main {
+    padding: 14px;
+  }
+
+  /* TOP BAR */
+  .topbar {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .search-box {
+    width: 100%;
+  }
+
+  .search-box input {
+    width: 100%;
+  }
+
+  /* CARDS */
+  .card {
+    padding: 16px;
+    border-radius: 16px;
+  }
+
+  .temp {
+    font-size: 42px;
+  }
+
+  /* TODAY / WEEK */
+  .today-week {
+    flex-direction: column;
+  }
+
+  .hourly {
+    overflow-x: auto;
+  }
+
+  /* OTHER CITIES */
+  .cities-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* MAP */
+  #indiaMap {
+    height: 320px !important;
+  }
+
+  /* NEWS */
+  .news-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* FORMS */
+  input, textarea, button {
+    font-size: 16px;
+  }
+}
+
+/* Small Phones */
+@media (max-width: 480px) {
+
+  h1, h2, h3 {
+    font-size: 18px;
+  }
+
+  .temp {
+    font-size: 36px;
+  }
+
+  .sidebar a {
+    font-size: 18px;
+  }
+
+  .hour-card {
+    width: 60px;
+    font-size: 12px;
+  }
+
+  .alert-box {
+    width: 90%;
+  }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="dashboard">
+
+  <div class="sidebar">
+  <a title="Home" href="home.html" style="text-decoration: none;">🏠</a>
+  <a title="Disaster Alert" href="disaster.html" style="text-decoration: none;">⚠️</a>
+  <a title="About Us" href="About.html" style="text-decoration: none;">ℹ️</a>
+  <a title="Donation" href="donation.html" style="text-decoration: none;">❤️</a>
+  <a title="Event" href="Event.html"style="text-decoration: none;">📅</a>
+  <a title="Feedback" href="Feedback.html" style="text-decoration: none;">💬</a>
+</div>
+
+
+
+
+  <div class="main">
+
+       <div class="topbar" style="grid-column: 1 / -1;">
+      <div class="search-box">
+        <input id="cityInput" placeholder="Enter city (e.g. Mumbai)">
+        
+        <button onclick="getWeather()">Search</button>
+        
+      </div>
+
+      <div style="display:flex; gap:10px; align-items:center;">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <button class="logout" onclick="logout()">Logout</button>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- LEFT -->
+      <div>
+        <div class="card">
+          <h2 id="city">--</h2>
+          <p id="date" class="date"></p>
+          <div class="temp" id="temp">--°C</div>
+          <p id="desc">--</p>
+          <small id="feels">Feels like --°C</small>
+        </div>
+
+        <!-- TODAY / WEEK -->
+        <div class="card today-week">
+          <div class="tw-left">
+            <h3>Today / Week</h3>
+            <div class="hourly" id="hourly"></div>
+
+            <div class="tomorrow">
+              <div>
+                <small>Tomorrow</small>
+                <h2 id="tomorrowTemp">--°</h2>
+                <p id="tomorrowDesc">--</p>
+              </div>
+              <div>⛈</div>
+            </div>
+          </div>
+
+          <div class="tw-right">
+            <h4>Sunrise</h4>
+            <p id="sunrise">--:--</p>
+            <h4>Sunset</h4>
+            <p id="sunset">--:--</p>
+            <small id="dayLength">--h --m</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT -->
+      <div>
+        <div class="card">
+          <h3>Today Highlights</h3>
+          <div class="grid">
+            <div id="humidity">💧 Humidity: --%</div>
+            <div id="wind">🌬 Wind: -- km/h</div>
+            <div id="pressure">⏱ Pressure: -- hPa</div>
+            <div id="visibility">👁 Visibility: -- km</div>
+          </div>
+        </div>
+         <div class="card other-cities">
+  <div class="other-header">
+    <h3>Other Cities</h3>
+    <small>Show All</small>
+  </div>
+
+  <div class="cities-grid">
+    <div class="city-card" id="city1"></div>
+    <div class="city-card" id="city2"></div>
+    <div class="city-card" id="city3"></div>
+    <div class="city-card" id="city4"></div>
+  </div>
+</div>
+</div>
+</div>
+<!-- INDIA MAP SECTION -->
+<div class="card">
+  <h3>India Weather & Disaster Map</h3>
+  <div id="indiaMap"></div>
+</div>
+<div class="card news-section">
+  <div class="news-header">
+    🌦 Weather News & Live Updates <span class="live-badge">LIVE</span>
+  </div>
+
+  <div class="news-grid" id="newsGrid"></div>
+
+
+<div class="card ad-news">
+  <div class="ad-label">📰 WEATHER NEWS • INDIA</div>
+
+  <div class="news-article" onclick="openArticle(activeArticle.link)">
+    <span class="news-badge" id="newsBadge"></span>
+    <h3 id="newsTitle"></h3>
+    <p id="newsDesc"></p>
+    <small id="newsDate"></small>
+  </div>
+</div>
+<footer class="footer">
+
+  <!-- BREADCRUMB -->
+  <div class="footer-top">
+    <span>World</span> ›
+    <span>Asia</span> ›
+    <span>India</span> ›
+    <span>Maharashtra</span> ›
+    <span><strong>Mumbai</strong></span>
+  </div>
+
+  <!-- NEARBY WEATHER -->
+  <div class="footer-near">
+    <strong>Weather Near Mumbai:</strong>
+    Kalyan-Dombivli, Thane, Vasai, Navi Mumbai
+  </div>
+
+  <!-- LINKS -->
+  <div class="footer-grid">
+
+    <div>
+      <h4>COMPANY</h4>
+      <a href="#">Proven Superior Accuracy</a>
+      <a href="#">About Us</a>
+      <a href="#">Careers</a>
+      <a href="#">Press</a>
+      <a href="#">Contact Us</a>
+
+      <div class="footer-social">
+        <i class="fab fa-facebook"></i>
+        <i class="fab fa-twitter"></i>
+      </div>
+    </div>
+
+    <div>
+      <h4>PRODUCTS & SERVICES</h4>
+      <a href="#">For Business</a>
+      <a href="#">For Partners</a>
+      <a href="#">APIs</a>
+      <a href="#">Weather Stations</a>
+    </div>
+
+    <div>
+      <h4>APPS & DOWNLOADS</h4>
+      <a href="#">Android App</a>
+      <a href="#">iPhone App</a>
+      <a href="#">All Downloads</a>
+
+      <h4 style="margin-top:14px;">SUBSCRIPTIONS</h4>
+      <a href="#">Premium</a>
+      <a href="#">Professional</a>
+    </div>
+
+    <div>
+      <h4>MORE</h4>
+      <a href="#">Severe Weather</a>
+      <a href="#">Health</a>
+      <a href="#">Hurricane</a>
+      <a href="#">Space & Astronomy</a>
+      <a href="#">Weather News</a>
+    </div>
+
+  </div>
+
+
+  <!-- COPYRIGHT -->
+  <div class="footer-bottom">
+    © 2026 WeatherScope. All Rights Reserved.  
+    <a href="#">Terms of Use</a> |
+    <a href="#">Privacy Policy</a> |
+    <a href="#">Cookie Policy</a> |
+    <a href="#">Data Sources</a>
+  </div>
+
+</footer>
+
+</div>
+
+<script>
+/* ================= CONFIG ================= */
+const API_KEY = "9a7b56b6f5b919658a75bca363637638";
+
+/* ================= OTHER CITIES ================= */
+async function loadOtherCities() {
+  const cities = [
+    { name: "Delhi", label: "India", id: "city1" },
+    { name: "Mumbai", label: "India", id: "city2" },
+    { name: "Bengaluru", label: "India", id: "city3" },
+    { name: "Chennai", label: "India", id: "city4" }
+  ];
+
+  for (let city of cities) {
+    const res = await fetch(
+      `https://api.openweathermap.org/data/2.5/weather?q=${city.name},IN&units=metric&appid=${API_KEY}`
+    );
+    const data = await res.json();
+
+    document.getElementById(city.id).innerHTML = `
+      <div>
+        <div class="city-temp">${Math.round(data.main.temp)}°</div>
+        <h4>${city.name}</h4>
+        <span>${city.label}</span>
+      </div>
+      <img src="https://openweathermap.org/img/wn/${data.weather[0].icon}.png">
+    `;
+  }
+}
+
+/* ================= MAP ================= */
+let map, cityMarker;
+
+function initIndiaMap() {
+  map = L.map("indiaMap", {
+    center: [22.5937, 78.9629],
+    zoom: 5,
+    minZoom: 4,
+    maxZoom: 7,
+    maxBounds: [[6.5, 68.0], [37.5, 97.5]],
+    maxBoundsViscosity: 1
+  });
+
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: "© OpenStreetMap contributors"
+  }).addTo(map);
+
+  setTimeout(() => map.invalidateSize(), 300);
+
+  addIndianCityMarkers();
+  addDisasterMarkers();
+}
+
+function updateMap(lat, lon, city) {
+  if (!map) return;
+  if (cityMarker) map.removeLayer(cityMarker);
+
+  cityMarker = L.marker([lat, lon])
+    .addTo(map)
+    .bindPopup(`<b>${city}</b>`)
+    .openPopup();
+
+  map.setView([lat, lon], 6);
+}
+
+function addIndianCityMarkers() {
+  [
+    ["Delhi", 28.61, 77.21],
+    ["Mumbai", 19.07, 72.87],
+    ["Bengaluru", 12.97, 77.59],
+    ["Chennai", 13.08, 80.27],
+    ["Kolkata", 22.57, 88.36]
+  ].forEach(c =>
+    L.marker([c[1], c[2]]).addTo(map).bindPopup(c[0])
+  );
+}
+
+function addDisasterMarkers() {
+  [
+    ["Flood Alert", 26.85, 80.95],
+    ["Cyclone Alert", 15.49, 73.82],
+    ["Heatwave Alert", 23.25, 77.41]
+  ].forEach(a =>
+    L.circleMarker([a[1], a[2]], {
+      radius: 10,
+      color: "red",
+      fillColor: "red",
+      fillOpacity: 0.6
+    }).addTo(map).bindPopup("⚠️ " + a[0])
+  );
+}
+const districtList = [
+  { name: "Mumbai Suburban", lat: 19.0760, lon: 72.8777 },
+  { name: "Pune District", lat: 18.5204, lon: 73.8567 },
+  { name: "Nagpur District", lat: 21.1458, lon: 79.0882 }
+];
+
+async function loadDistrictWeather() {
+  let html = "";
+
+  for (let d of districtList) {
+    const res = await fetch(
+      `https://api.openweathermap.org/data/2.5/weather?lat=${d.lat}&lon=${d.lon}&units=metric&appid=${API_KEY}`
+    );
+    const data = await res.json();
+
+    html += `
+      <p>
+        <strong>${d.name}</strong> :
+        ${Math.round(data.main.temp)}°C,
+        ${data.weather[0].main}
+      </p>
+    `;
+  }
+
+  document.getElementById("districtWeather").innerHTML = html;
+}
+
+/* ================= WEATHER ================= */
+async function getWeather() {
+  const city = document.getElementById("cityInput").value || "Mumbai";
+
+  const current = await fetch(
+    `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${API_KEY}`
+  ).then(r => r.json());
+
+  document.getElementById("city").innerText = current.name;
+  document.getElementById("temp").innerText = Math.round(current.main.temp) + "°C";
+  document.getElementById("desc").innerText = current.weather[0].main;
+  document.getElementById("feels").innerText =
+    "Feels like " + Math.round(current.main.feels_like) + "°C";
+
+  document.getElementById("humidity").innerText = "💧 Humidity: " + current.main.humidity + "%";
+  document.getElementById("wind").innerText = "🌬 Wind: " + current.wind.speed + " km/h";
+  document.getElementById("pressure").innerText = "⏱ Pressure: " + current.main.pressure + " hPa";
+  document.getElementById("visibility").innerText =
+    "👁 Visibility: " + current.visibility / 1000 + " km";
+
+  updateMap(current.coord.lat, current.coord.lon, current.name);
+}
+
+/* ================= WEATHER NEWS ================= */
+const weatherArticles = [
+  {
+    title: "IMD issues rainfall alert for multiple Indian states",
+    desc: "The India Meteorological Department has forecast heavy rainfall across several regions due to an active monsoon system.",
+    tag: "IMD ALERT",
+    link: "https://mausam.imd.gov.in/",
+  },
+  {
+    title: "Cyclone threat reduces but coastal regions advised caution",
+    desc: "Weather experts advise fishermen and coastal residents to stay alert as sea conditions remain rough.",
+    tag: "CYCLONE",
+    link: "https://www.ndtv.com/india",
+  },
+  {
+    title: "Heatwave conditions expected in central India this week",
+    desc: "Temperatures may rise above normal in parts of Madhya Pradesh and Rajasthan, IMD warns.",
+    tag: "HEATWAVE",
+    link: "https://www.thehindu.com/news/national/",
+  },
+  {
+    title: "Flood monitoring intensified as rivers cross warning levels",
+    desc: "State disaster authorities are monitoring river levels amid continuous rainfall in eastern India.",
+    tag: "FLOOD",
+    link: "https://indianexpress.com/section/india/",
+  }
+];
+
+let currentArticleIndex = 0;
+let activeArticle = weatherArticles[0];
+
+function showWeatherArticle() {
+  activeArticle = weatherArticles[currentArticleIndex];
+
+  document.getElementById("newsTitle").innerText = activeArticle.title;
+  document.getElementById("newsDesc").innerText = activeArticle.desc;
+  document.getElementById("newsBadge").innerText = activeArticle.tag;
+
+  document.getElementById("newsDate").innerText =
+    new Date().toLocaleDateString("en-IN", {
+      weekday: "long",
+      day: "numeric",
+      month: "short",
+      year: "numeric"
+    });
+
+  currentArticleIndex =
+    (currentArticleIndex + 1) % weatherArticles.length;
+}
+
+// Auto-rotate every 6 seconds
+setInterval(showWeatherArticle, 6000);
+
+// Load immediately on page open
+showWeatherArticle();
+
+const weatherNews = [
+  {
+    title: "IMD Weather Update LIVE",
+    videoId: "p7HKvqRI_Bo",
+    tag: "LIVE"
+  },
+  {
+    title: "Cyclone & Storm Alert India",
+    videoId: "h6G9w5A2CzQ",
+    tag: "CYCLONE"
+  },
+  {
+    title: "Monsoon & Flood Situation India",
+    videoId: "R9nLkFz0Y8E",
+    tag: "FLOOD"
+  },
+  {
+    title: "Heatwave Safety Advisory India",
+    videoId: "5pYJrXJ1m5M",
+    tag: "HEATWAVE"
+  }
+];
+
+
+function loadWeatherNews() {
+  const grid = document.getElementById("newsGrid");
+
+  if (!grid) return;
+
+  const today = new Date().toLocaleDateString("en-IN", {
+    weekday: "long",
+    day: "numeric",
+    month: "short",
+    year: "numeric"
+  });
+
+  grid.innerHTML = "";
+
+  weatherNews.forEach(news => {
+    grid.innerHTML += `
+      <div class="news-card" onclick="openYT('${news.videoId}')">
+        <div class="news-thumb">
+          <span class="news-tag">${news.tag}</span>
+          <img src="https://img.youtube.com/vi/${news.videoId}/hqdefault.jpg">
+          <div class="play-btn">▶</div>
+        </div>
+        <div class="news-info">
+          <div class="news-title">${news.title}</div>
+          <div class="news-date">${today}</div>
+        </div>
+      </div>
+    `;
+  });
+}
+
+
+function openYT(id) {
+  window.open(`https://www.youtube.com/watch?v=${id}`, "_blank");
+}
+
+
+/* ================= THEME ================= */
+function toggleTheme() {
+  document.body.classList.toggle("light");
+}
+
+/* ================= INIT ================= */
+document.getElementById("date").innerText =
+  new Date().toLocaleDateString("en-IN", {
+    weekday: "long", year: "numeric", month: "short", day: "numeric"
+  });
+
+window.addEventListener("load", () => {
+  initIndiaMap();
+  loadOtherCities();
+  getWeather();
+  loadWeatherNews();
+});
+</script>
+<script>
+async function getWeather() {
+  const city = document.getElementById("cityInput").value || "Mumbai";
+
+  /* CURRENT WEATHER */
+  const current = await fetch(
+    `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${API_KEY}`
+  ).then(r => r.json());
+
+  /* FORECAST (THIS WAS MISSING ❗) */
+  const forecast = await fetch(
+    `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${API_KEY}`
+  ).then(r => r.json());
+
+  /* MAIN DATA */
+  document.getElementById("city").innerText = current.name;
+  document.getElementById("temp").innerText = Math.round(current.main.temp) + "°C";
+  document.getElementById("desc").innerText = current.weather[0].main;
+  document.getElementById("feels").innerText =
+    "Feels like " + Math.round(current.main.feels_like) + "°C";
+
+  /* HIGHLIGHTS */
+  document.getElementById("humidity").innerText =
+    "💧 Humidity: " + current.main.humidity + "%";
+  document.getElementById("wind").innerText =
+    "🌬 Wind: " + current.wind.speed + " km/h";
+  document.getElementById("pressure").innerText =
+    "⏱ Pressure: " + current.main.pressure + " hPa";
+  document.getElementById("visibility").innerText =
+    "👁 Visibility: " + current.visibility / 1000 + " km";
+
+  /* ================= TODAY / WEEK (FIXED) ================= */
+  const hourly = document.getElementById("hourly");
+  hourly.innerHTML = "";
+
+  if (forecast.list && forecast.list.length > 0) {
+    forecast.list.slice(0, 6).forEach(item => {
+      hourly.innerHTML += `
+        <div class="hour-card">
+          ${item.dt_txt.slice(11, 16)}<br>
+          <img src="https://openweathermap.org/img/wn/${item.weather[0].icon}.png">
+          ${Math.round(item.main.temp)}°
+        </div>
+      `;
+    });
+
+    const tomorrowItem =
+      forecast.list.find(i => i.dt_txt.includes("12:00:00")) ||
+      forecast.list[forecast.list.length - 1];
+
+    document.getElementById("tomorrowTemp").innerText =
+      Math.round(tomorrowItem.main.temp) + "°";
+
+    document.getElementById("tomorrowDesc").innerText =
+      tomorrowItem.weather[0].main;
+  }
+
+  /* SUN DATA */
+  const sunrise = new Date(current.sys.sunrise * 1000);
+  const sunset = new Date(current.sys.sunset * 1000);
+
+  document.getElementById("sunrise").innerText =
+    sunrise.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
+
+  document.getElementById("sunset").innerText =
+    sunset.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
+
+  const diff = current.sys.sunset - current.sys.sunrise;
+  document.getElementById("dayLength").innerText =
+    Math.floor(diff / 3600) + "h " + Math.floor((diff % 3600) / 60) + "m";
+
+  /* MAP UPDATE */
+  updateMap(current.coord.lat, current.coord.lon, current.name);
+}
+</script>
+
+
+</body>
+</html>
