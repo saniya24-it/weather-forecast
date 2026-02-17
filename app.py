@@ -27,10 +27,11 @@ def init_db():
     # USERS
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        email TEXT UNIQUE NOT NULL,
-        password TEXT NOT NULL
-    )
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT,
+    email TEXT UNIQUE NOT NULL,
+    password TEXT NOT NULL
+)
     """)
 
     # FEEDBACK
@@ -70,17 +71,7 @@ def init_db():
     )
     """)
 
-    # WEATHER SEARCH HISTORY
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS weather_history (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        email TEXT,
-        city TEXT,
-        temperature TEXT,
-        description TEXT,
-        searched_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-    """)
+    
 
     # DISASTER HISTORY
     cursor.execute("""
@@ -148,26 +139,7 @@ def login():
 
     # ❗ FIX: Return status 401 so frontend can detect failure
     return jsonify({"success": False, "message": "Invalid credentials"}), 401
-# ==========================================================
-#  SAVE WEATHER SEARCH HISTORY
-# ==========================================================
-@app.route("/api/save-weather", methods=["POST"])
-def save_weather():
-    data = request.json
-    email = data.get("email")
-    city = data.get("city")
-    temperature = data.get("temperature")
-    description = data.get("description")
 
-    conn = get_connection()
-    cursor = conn.cursor()
-
-    cursor.execute("INSERT INTO weather_history (email, city, temperature, description) VALUES (?, ?, ?, ?)",
-                   (email, city, temperature, description))
-    conn.commit()
-    conn.close()
-
-    return jsonify({"success": True})
 
 
 # ==========================================================
