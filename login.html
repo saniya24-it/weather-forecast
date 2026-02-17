@@ -177,7 +177,8 @@ button:hover {
       error.style.display = "none";
 
       try {
-        const res = await fetch("http://127.0.0.1:5000/api/login", {
+        const res = fetch("https://weather-forecast-2-ljuo.onrender.com/api/login", {
+
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email, password }),
@@ -192,7 +193,7 @@ button:hover {
         }
 
         localStorage.setItem("loggedIn", "true");
-        window.location.href = "https://weather-forecast-2-ljuo.onrender.com/dashboard.html";
+        window.location.href = "dashboard.html";
       } catch (err) {
         error.textContent = "Server not reachable";
         error.style.display = "block";
